@@ -2,7 +2,7 @@
   "name": "axonpharma-dashboard",
   "version": "1.0.0",
   "private": true,
-  "description": "Dashboard automatizado de campañas Meta (Axon Pharma Colombia) con data de Windsor.ai",
+  "description": "Dashboard automatizado de campañas Meta (Axon Pharma Colombia)",
   "scripts": {
     "refresh": "node refresh.js"
   },

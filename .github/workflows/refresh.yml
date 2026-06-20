@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Jalar data real de Meta (Windsor.ai)
+      - name: Jalar data real de Meta
         env:
           WINDSOR_API_KEY: ${{ secrets.WINDSOR_API_KEY }}
         run: node refresh.js
