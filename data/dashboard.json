@@ -1,0 +1,25 @@
+{
+  "updated": "2026-06-20T00:00:00",
+  "account": { "id": "1192531552979145", "name": "MARUCHAN_Porter_BMCR", "connector": "facebook" },
+  "filter": "MARUCHAN",
+  "rows": [
+    {"campaign":"MAY26_CR_JOB_GPNMR-00062_MARUCHAN_ALCANCE_POST","objective":"OUTCOME_AWARENESS","date":"2026-05-21","spend":9.85,"impressions":24379,"reach":22999,"frequency":1.06,"clicks":41,"link_clicks":0,"cpc":0.2402,"cpm":0.404,"ctr":0.0017},
+    {"campaign":"MAY26_CR_JOB_GPNMR-00062_MARUCHAN_ALCANCE_POST","objective":"OUTCOME_AWARENESS","date":"2026-05-22","spend":9.19,"impressions":24195,"reach":23564,"frequency":1.0268,"clicks":29,"link_clicks":0,"cpc":0.3169,"cpm":0.3798,"ctr":0.0012},
+    {"campaign":"MAY26_CR_JOB_GPNMR-00062_MARUCHAN_ALCANCE_POST","objective":"OUTCOME_AWARENESS","date":"2026-05-23","spend":10.07,"impressions":28298,"reach":28268,"frequency":1.0011,"clicks":40,"link_clicks":0,"cpc":0.2518,"cpm":0.3559,"ctr":0.0014},
+    {"campaign":"MAY26_CR_JOB_GPNMR-00062_MARUCHAN_ALCANCE_POST","objective":"OUTCOME_AWARENESS","date":"2026-05-24","spend":9.6,"impressions":28370,"reach":26590,"frequency":1.0669,"clicks":48,"link_clicks":2,"cpc":0.2,"cpm":0.3384,"ctr":0.0017},
+    {"campaign":"MAY26_CR_JOB_GPNMR-00062_MARUCHAN_ALCANCE_POST","objective":"OUTCOME_AWARENESS","date":"2026-05-25","spend":8.4,"impressions":24328,"reach":22251,"frequency":1.0933,"clicks":65,"link_clicks":0,"cpc":0.1292,"cpm":0.3453,"ctr":0.0027},
+    {"campaign":"MAY26_CR_JOB_GPNMR-00062_MARUCHAN_ALCANCE_POST","objective":"OUTCOME_AWARENESS","date":"2026-05-26","spend":8.26,"impressions":23902,"reach":22494,"frequency":1.0626,"clicks":42,"link_clicks":0,"cpc":0.1967,"cpm":0.3456,"ctr":0.0018},
+    {"campaign":"MAY26_CR_JOB_GPNMR-00062_MARUCHAN_ALCANCE_POST","objective":"OUTCOME_AWARENESS","date":"2026-05-27","spend":1.64,"impressions":4441,"reach":4300,"frequency":1.0328,"clicks":7,"link_clicks":0,"cpc":0.2343,"cpm":0.3693,"ctr":0.0016},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-09","spend":0.94,"impressions":4372,"reach":4367,"frequency":1.0011,"clicks":7,"link_clicks":0,"cpc":0.1343,"cpm":0.215,"ctr":0.0016},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-10","spend":1.75,"impressions":5894,"reach":5893,"frequency":1.0002,"clicks":12,"link_clicks":0,"cpc":0.1458,"cpm":0.2969,"ctr":0.002},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-11","spend":1.81,"impressions":5257,"reach":5257,"frequency":1,"clicks":15,"link_clicks":0,"cpc":0.1207,"cpm":0.3443,"ctr":0.0029},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-12","spend":2.67,"impressions":6960,"reach":6836,"frequency":1.0181,"clicks":12,"link_clicks":0,"cpc":0.2225,"cpm":0.3836,"ctr":0.0017},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-13","spend":1.91,"impressions":5130,"reach":5130,"frequency":1,"clicks":6,"link_clicks":0,"cpc":0.3183,"cpm":0.3723,"ctr":0.0012},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-14","spend":2.46,"impressions":7506,"reach":7506,"frequency":1,"clicks":17,"link_clicks":0,"cpc":0.1447,"cpm":0.3277,"ctr":0.0023},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-15","spend":1.78,"impressions":5613,"reach":5581,"frequency":1.0057,"clicks":18,"link_clicks":4,"cpc":0.0989,"cpm":0.3171,"ctr":0.0032},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-16","spend":1.9,"impressions":5264,"reach":5168,"frequency":1.0186,"clicks":4,"link_clicks":1,"cpc":0.475,"cpm":0.3609,"ctr":0.0008},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-17","spend":1.91,"impressions":5254,"reach":5176,"frequency":1.0151,"clicks":4,"link_clicks":4,"cpc":0.4775,"cpm":0.3635,"ctr":0.0008},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-18","spend":2.07,"impressions":5420,"reach":5310,"frequency":1.0207,"clicks":4,"link_clicks":2,"cpc":0.5175,"cpm":0.3819,"ctr":0.0007},
+    {"campaign":"JUN26_CR_JOB_GPNMR-00069 _MARUCHAN_ALCANCE","objective":"OUTCOME_AWARENESS","date":"2026-06-19","spend":1.83,"impressions":4688,"reach":4688,"frequency":1,"clicks":8,"link_clicks":3,"cpc":0.2288,"cpm":0.3904,"ctr":0.0017}
+  ]
+}

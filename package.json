@@ -1,0 +1,12 @@
+{
+  "name": "maruchan-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dashboard automatizado de campañas Meta (Maruchan) con data de Windsor.ai",
+  "scripts": {
+    "refresh": "node refresh.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Maruchan · Meta Awareness</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#003D91; --red:#DA291C; --ink:#1a2230; --muted:#6b7480;
+    --line:#e6e9ef; --bg:#f4f6fa; --card:#ffffff; --good:#1a7f4b; --warn:#b07400;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 20px 60px;}
+  header.top{background:var(--navy);color:#fff;border-radius:14px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 6px 20px rgba(0,61,145,.18);}
+  header.top h1{margin:0;font-size:22px;letter-spacing:.3px}
+  header.top .sub{opacity:.85;font-size:13px;margin-top:4px}
+  .badge{background:var(--red);color:#fff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:.5px}
+  .updated{font-size:12px;opacity:.8;text-align:right}
+  .grid{display:grid;gap:16px;margin-top:20px}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(20,30,50,.04)}
+  .kpi .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+  .kpi .value{font-size:26px;font-weight:800;color:var(--navy);margin-top:6px;line-height:1.1}
+  .kpi .foot{font-size:12px;color:var(--muted);margin-top:4px}
+  h2{font-size:16px;color:var(--navy);margin:30px 0 12px;border-left:4px solid var(--red);padding-left:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:#f0f3f9;color:var(--navy);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:none}
+  .pill{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700}
+  .pill.active{background:#e3f3ea;color:var(--good)}
+  .pill.ended{background:#eef1f5;color:var(--muted)}
+  .chart-card{height:340px}
+  .two{grid-template-columns:1fr 1fr}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+  footer{margin-top:34px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
+  .note{font-size:12px;color:var(--muted);margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <h1>Dashboard Maruchan</h1><span class="badge">META · AWARENESS</span>
+      </div>
+      <div class="sub" id="subhead">Cargando…</div>
+    </div>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <h2>Tendencia diaria (campaña activa)</h2>
+  <div class="card chart-card"><canvas id="trend"></canvas></div>
+
+  <h2>Resumen por campaña</h2>
+  <div class="card" style="padding:0;overflow-x:auto">
+    <table id="campTable">
+      <thead><tr>
+        <th>Campaña</th><th>Estado</th><th>Periodo</th>
+        <th class="num">Spend</th><th class="num">Impresiones</th><th class="num">Reach</th>
+        <th class="num">Frecuencia</th><th class="num">Clicks</th><th class="num">CPM</th><th class="num">CTR</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <h2>Detalle diario — campaña activa</h2>
+  <div class="card" style="padding:0;overflow-x:auto">
+    <table id="dailyTable">
+      <thead><tr>
+        <th>Fecha</th><th class="num">Spend</th><th class="num">Impresiones</th>
+        <th class="num">Reach</th><th class="num">Frecuencia</th><th class="num">Clicks</th>
+        <th class="num">CPM</th><th class="num">CPC</th><th class="num">CTR</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <footer>
+    <div>Fuente: <b>Meta Ads</b> vía Windsor.ai · Cuenta <span id="acct"></span></div>
+    <div>Actualización automática diaria · Solo data real de Meta · Colores institucionales navy/rojo</div>
+  </footer>
+</div>
+
+<script>
+const fmt   = n => new Intl.NumberFormat('es-CR').format(Math.round(n));
+const money = n => '$'+new Intl.NumberFormat('es-CR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
+const dec   = (n,d=2)=> new Intl.NumberFormat('es-CR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const dmm   = d => new Date(d+'T00:00:00').toLocaleDateString('es-CR',{day:'2-digit',month:'short'});
+
+function agg(rows){
+  const s={spend:0,impressions:0,reach:0,clicks:0,link_clicks:0};
+  rows.forEach(r=>{s.spend+=r.spend;s.impressions+=r.impressions;s.reach+=r.reach;s.clicks+=r.clicks;s.link_clicks+=(r.link_clicks||0);});
+  s.cpm = s.impressions? s.spend/s.impressions*1000 : 0;
+  s.cpc = s.clicks? s.spend/s.clicks : 0;
+  s.ctr = s.impressions? s.clicks/s.impressions*100 : 0;
+  s.freq= s.reach? s.impressions/s.reach : 0;
+  s.days= new Set(rows.map(r=>r.date)).size;
+  return s;
+}
+
+fetch('data/dashboard.json?_='+Date.now()).then(r=>r.json()).then(data=>{
+  const rows = data.rows;
+  document.getElementById('acct').textContent = data.account.name+' ('+data.account.id+')';
+  const upd = new Date(data.updated);
+  document.getElementById('updated').innerHTML =
+    'Actualizado<br><b>'+upd.toLocaleDateString('es-CR',{day:'2-digit',month:'long',year:'numeric'})+'</b>';
+
+  // campaigns grouped
+  const byCamp = {};
+  rows.forEach(r=>{(byCamp[r.campaign] ||= []).push(r);});
+  const camps = Object.entries(byCamp).map(([name,rs])=>{
+    const dates = rs.map(r=>r.date).sort();
+    return {name, rows:rs, start:dates[0], end:dates[dates.length-1], a:agg(rs)};
+  }).sort((x,y)=> x.start<y.start?1:-1);
+
+  const active = camps[0]; // most recent
+  const t = agg(rows);
+  document.getElementById('subhead').textContent =
+    camps.length+' campañas · '+t.days+' días con entrega · campaña activa: '+active.name;
+
+  // KPIs (overall real delivery)
+  const kpis = [
+    {label:'Inversión total', value:money(t.spend), foot:t.days+' días con datos'},
+    {label:'Impresiones', value:fmt(t.impressions), foot:'CPM '+money(t.cpm)},
+    {label:'Reach total*', value:fmt(t.reach), foot:'*suma diaria, no único'},
+    {label:'Frecuencia media', value:dec(t.freq,2), foot:'impresiones / reach'},
+    {label:'Clicks', value:fmt(t.clicks), foot:'CPC '+money(t.cpc)},
+    {label:'CTR', value:dec(t.ctr,2)+'%', foot:'clicks / impresiones'},
+  ];
+  document.getElementById('kpis').innerHTML = kpis.map(k=>
+    `<div class="card kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="foot">${k.foot}</div></div>`
+  ).join('');
+
+  // campaign table
+  const todayStr = data.updated.slice(0,10);
+  document.querySelector('#campTable tbody').innerHTML = camps.map(c=>{
+    const recent = c.end >= addDays(todayStr,-3);
+    return `<tr>
+      <td>${c.name.trim()}</td>
+      <td><span class="pill ${recent?'active':'ended'}">${recent?'Activa':'Finalizada'}</span></td>
+      <td>${dmm(c.start)} – ${dmm(c.end)}</td>
+      <td class="num">${money(c.a.spend)}</td>
+      <td class="num">${fmt(c.a.impressions)}</td>
+      <td class="num">${fmt(c.a.reach)}</td>
+      <td class="num">${dec(c.a.freq,2)}</td>
+      <td class="num">${fmt(c.a.clicks)}</td>
+      <td class="num">${money(c.a.cpm)}</td>
+      <td class="num">${dec(c.a.ctr,2)}%</td>
+    </tr>`;
+  }).join('');
+
+  // daily table (active campaign)
+  const daily = [...active.rows].sort((a,b)=> a.date<b.date?1:-1);
+  document.querySelector('#dailyTable tbody').innerHTML = daily.map(r=>`
+    <tr><td>${dmm(r.date)}</td>
+      <td class="num">${money(r.spend)}</td><td class="num">${fmt(r.impressions)}</td>
+      <td class="num">${fmt(r.reach)}</td><td class="num">${dec(r.frequency,2)}</td>
+      <td class="num">${fmt(r.clicks)}</td><td class="num">${money(r.cpm)}</td>
+      <td class="num">${money(r.cpc)}</td><td class="num">${dec(r.ctr*100,2)}%</td></tr>`).join('');
+
+  // chart (active campaign chronological)
+  const c = [...active.rows].sort((a,b)=> a.date<b.date?-1:1);
+  new Chart(document.getElementById('trend'),{
+    data:{
+      labels:c.map(r=>dmm(r.date)),
+      datasets:[
+        {type:'bar',label:'Impresiones',data:c.map(r=>r.impressions),backgroundColor:'#003D91',yAxisID:'y',order:2,borderRadius:4},
+        {type:'line',label:'Spend ($)',data:c.map(r=>r.spend),borderColor:'#DA291C',backgroundColor:'#DA291C',yAxisID:'y1',order:1,tension:.3,pointRadius:3,borderWidth:2}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top'}},
+      scales:{
+        y:{position:'left',title:{display:true,text:'Impresiones'},ticks:{callback:v=>fmt(v)}},
+        y1:{position:'right',title:{display:true,text:'Spend ($)'},grid:{drawOnChartArea:false}}
+      }}
+  });
+});
+
+function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
+</script>
+</body>
+</html>
