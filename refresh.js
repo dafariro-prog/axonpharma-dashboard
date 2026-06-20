@@ -24,7 +24,6 @@ const url = `https://connectors.windsor.ai/${CONNECTOR}?` + new URLSearchParams(
   api_key: API_KEY,
   date_preset: DATE_PRESET,
   fields: FIELDS.join(','),
-  _renderer: 'json',
 });
 
 (async () => {
