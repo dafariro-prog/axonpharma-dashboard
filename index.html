@@ -61,7 +61,7 @@
   <div class="card" style="padding:0;overflow-x:auto">
     <table id="campTable">
       <thead><tr>
-        <th>Campaña</th><th>Estado</th><th>Periodo</th>
+        <th>Campaña</th><th>Objetivo</th><th>Estado</th><th>Periodo</th>
         <th class="num">Spend</th><th class="num">Impresiones</th><th class="num">Reach</th>
         <th class="num">Frecuencia</th><th class="num">Clicks</th><th class="num">CPM</th><th class="num">CTR</th>
       </tr></thead>
@@ -92,6 +92,13 @@ const fmt   = n => new Intl.NumberFormat('es-CR').format(Math.round(n));
 const money = n => '$'+new Intl.NumberFormat('es-CR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n);
 const dec   = (n,d=2)=> new Intl.NumberFormat('es-CR',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
 const dmm   = d => new Date(d+'T00:00:00').toLocaleDateString('es-CR',{day:'2-digit',month:'short'});
+
+const OBJ = {
+  OUTCOME_AWARENESS:'Alcance', OUTCOME_ENGAGEMENT:'Interacción', OUTCOME_TRAFFIC:'Tráfico',
+  OUTCOME_LEADS:'Leads', OUTCOME_SALES:'Ventas', OUTCOME_APP_PROMOTION:'App',
+  VIDEO_VIEWS:'Reproducciones', REACH:'Alcance', BRAND_AWARENESS:'Awareness'
+};
+const objLabel = o => OBJ[o] || (o||'—');
 
 function agg(rows){
   const s={spend:0,impressions:0,reach:0,clicks:0,link_clicks:0};
@@ -143,6 +150,7 @@ fetch('data/dashboard.json?_='+Date.now()).then(r=>r.json()).then(data=>{
     const recent = c.end >= addDays(todayStr,-3);
     return `<tr>
       <td>${c.name.trim()}</td>
+      <td>${objLabel(c.rows[0].objective)}</td>
       <td><span class="pill ${recent?'active':'ended'}">${recent?'Activa':'Finalizada'}</span></td>
       <td>${dmm(c.start)} – ${dmm(c.end)}</td>
       <td class="num">${money(c.a.spend)}</td>
