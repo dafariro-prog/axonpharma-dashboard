@@ -16,8 +16,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 .topbar{background:linear-gradient(135deg,var(--blue) 0%,var(--blue-dark) 100%);color:#fff;padding:28px 24px 24px;border-bottom:4px solid var(--gray-dark)}
 .topbar-inner{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:16px}
-.brand-mark{background:#fff;border-radius:10px;padding:12px 18px;box-shadow:0 4px 12px rgba(0,0,0,.18);display:flex;align-items:center}
-.brand-mark{gap:14px}
+.brand-mark{background:#fff;border-radius:10px;padding:12px 18px;box-shadow:0 4px 12px rgba(0,0,0,.18);display:flex;align-items:center;gap:14px}
 .brand-mark svg,.brand-mark img{display:block;height:42px;width:auto}
 .brand-div{width:1px;height:34px;background:#D9DEE6;display:inline-block;flex-shrink:0}
 .brand h1{font-size:22px;font-weight:700;letter-spacing:-.2px;margin-bottom:4px}
@@ -31,6 +30,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 .flight-progress .label b{color:var(--text);font-weight:700}
 .flight-progress .bar{flex:1;min-width:200px;height:10px;background:#E7EEF6;border-radius:6px;overflow:hidden;position:relative}
 .flight-progress .bar-fill{height:100%;background:linear-gradient(90deg,var(--blue-dark),var(--blue));border-radius:6px}
+.filters{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.filters .f{display:flex;flex-direction:column;gap:4px}
+.filters label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.filters select{font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;color:var(--text);min-width:120px;cursor:pointer}
+.filters select:focus{outline:2px solid var(--blue);outline-offset:0}
+.filters #fCamp{min-width:240px;max-width:340px}
+.filters .f-count{font-size:12px;color:var(--text-muted);padding-bottom:9px;margin-left:auto}
+.filters .f-reset{align-self:flex-end;font-size:12px;font-weight:600;color:var(--blue-dark);background:#E3F1FA;border:none;padding:9px 14px;border-radius:8px;cursor:pointer}
 section{margin-top:32px}
 h2.section-title{font-size:18px;font-weight:700;color:var(--blue-dark);display:flex;align-items:center;gap:10px;margin-bottom:14px}
 h2.section-title::before{content:"";width:4px;height:18px;background:var(--gray-dark);border-radius:2px}
@@ -82,12 +89,6 @@ h2.section-title::before{content:"";width:4px;height:18px;background:var(--gray-
 .chart-wrap{height:330px;position:relative}
 .analysis{background:linear-gradient(135deg,#FFFFFF 0%,#F5FAFD 100%);border-radius:14px;padding:24px;box-shadow:var(--shadow);border-left:4px solid var(--blue)}
 .analysis h3{color:var(--blue-dark);font-size:16px;font-weight:700;margin-bottom:14px}
-.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
-.finding{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;line-height:1.55}
-.finding .f-label{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:8px}
-.finding.positive .f-label{background:var(--green-bg);color:var(--green)}
-.finding.info .f-label{background:#E3F1FA;color:var(--blue-dark)}
-.finding strong{color:var(--blue-dark)}
 .reco-list{display:grid;grid-template-columns:1fr;gap:10px;margin-top:4px}
 .reco{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px}
 .reco .reco-num{width:28px;height:28px;border-radius:50%;background:var(--blue-dark);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
@@ -128,6 +129,15 @@ footer .src{margin-top:6px;opacity:.85}
 </div></div>
 <div class="container">
   <div class="flight-progress" id="flight"></div>
+
+  <div class="filters" id="filters">
+    <div class="f"><label for="fYear">Año</label><select id="fYear"></select></div>
+    <div class="f"><label for="fMonth">Mes</label><select id="fMonth"></select></div>
+    <div class="f"><label for="fCamp">Campaña</label><select id="fCamp"></select></div>
+    <div class="f"><label for="fStatus">Estado</label><select id="fStatus"></select></div>
+    <span class="f-count" id="fCount"></span>
+    <button class="f-reset" id="fReset">Limpiar filtros</button>
+  </div>
 
   <div class="okr-section">
     <div class="okr-header"><span class="okr-badge">Métrica clave</span><h2>Alcance de marca · Axon Pharma Colombia</h2></div>
@@ -200,10 +210,13 @@ const copShort=n=>{n=n||0;const a=Math.abs(n);
   if(a>=1e3)return '$'+dec(n/1e3,0)+' K';
   return '$'+fmt(n);};
 const dmm=d=>new Date(d+'T00:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short'});
+const dmy=d=>new Date(d+'T00:00:00').toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'2-digit'});
+const MESN={'01':'Enero','02':'Febrero','03':'Marzo','04':'Abril','05':'Mayo','06':'Junio','07':'Julio','08':'Agosto','09':'Septiembre','10':'Octubre','11':'Noviembre','12':'Diciembre'};
 const PRODUCTS=['A-CERUMEN','MARIMER&FLORATIL','MARIMER','FLORATIL'];
 const productOf=c=>{const u=c.toUpperCase();for(const p of PRODUCTS)if(u.includes(p))return p==='MARIMER&FLORATIL'?'MARIMER & FLORATIL':p;return 'Otros';};
 const isTraffic=r=>r.objective==='LINK_CLICKS'||/traffic/i.test(r.campaign);
 const objName=r=>isTraffic(r)?'Traffic':'Awareness';
+const byId=id=>document.getElementById(id);
 
 function agg(rows){
   const s={spend:0,impressions:0,reach:0,clicks:0,link_clicks:0};
@@ -215,159 +228,224 @@ function agg(rows){
   return s;
 }
 
+let chSpend, chKpi;
+const BLUE='#0095D5',GRAY='#56606A';
+Chart.defaults.font.family="-apple-system,'Segoe UI',Roboto,sans-serif";Chart.defaults.color='#5A6271';Chart.defaults.font.size=12;
+
 fetch('data/dashboard.json?_='+Date.now()).then(r=>r.json()).then(data=>{
-  const rows=data.rows;
-  const dates=rows.map(r=>r.date).sort();
-  const dFrom=dates[0],dTo=dates[dates.length-1];
+  const ALL=data.rows;
+  const gMax=ALL.map(r=>r.date).sort().at(-1);
+  const gMin=ALL.map(r=>r.date).sort()[0];
+  const campEnd={}; ALL.forEach(r=>{ if(!campEnd[r.campaign]||r.date>campEnd[r.campaign]) campEnd[r.campaign]=r.date; });
+  const statusOf=c=> campEnd[c]>=addDays(gMax,-2) ? 'Activa' : 'Finalizada';
+
   const upd=new Date(data.updated);
   const updTxt=upd.toLocaleDateString('es-CO',{day:'2-digit',month:'long',year:'numeric'});
+  byId('footAcct').textContent=data.account.name+' ('+data.account.id+')';
+  byId('footUpd').textContent='Actualizado '+updTxt;
 
-  document.getElementById('footAcct').textContent=data.account.name+' ('+data.account.id+')';
-  document.getElementById('footUpd').textContent='Actualizado '+updTxt;
-  document.getElementById('subhead').textContent='Colombia · Meta (Facebook / Instagram) · '+dmm(dFrom)+' – '+dmm(dTo)+' 2026';
+  // ---- Flight (siempre sobre el histórico completo) ----
+  const activeCamps=[...new Set(ALL.filter(r=>statusOf(r.campaign)==='Activa').map(r=>r.campaign))];
+  byId('flight').innerHTML=`
+    <div class="label"><b>${activeCamps.length} campañas activas</b> · data al ${dmy(gMax)}</div>
+    <div class="bar"><div class="bar-fill" style="width:100%"></div></div>
+    <div class="label" style="font-size:12px">Histórico desde ${dmy(gMin)}</div>`;
 
-  const T=agg(rows);
-  document.getElementById('headerMeta').innerHTML=`
-    <div class="pill"><strong>Periodo</strong><span>${dmm(dFrom)} – ${dmm(dTo)} 2026</span></div>
-    <div class="pill"><strong>Inversión total</strong><span>${copShort(T.spend)}</span></div>
-    <div class="pill"><strong>Actualizado</strong><span>${updTxt}</span></div>`;
+  // ---- Poblar filtros ----
+  const fy=byId('fYear'),fm=byId('fMonth'),fc=byId('fCamp'),fs=byId('fStatus'),fr=byId('fReset');
+  const years=[...new Set(ALL.map(r=>r.date.slice(0,4)))].sort();
+  fy.innerHTML='<option value="all">Todos</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  fm.innerHTML='<option value="all">Todos</option>'+Object.keys(MESN).map(m=>`<option value="${m}">${MESN[m]}</option>`).join('');
+  const camps=[...new Set(ALL.map(r=>r.campaign.trim()))].sort();
+  fc.innerHTML='<option value="all">Todas</option>'+camps.map(c=>`<option value="${c}">${c}</option>`).join('');
+  fs.innerHTML='<option value="all">Todos</option><option value="Activa">Activa</option><option value="Finalizada">Finalizada</option>';
 
-  // Flight: active = current month flight (Jun26)
-  const activeRows=rows.filter(r=>/^jun26/i.test(r.campaign));
-  const aDates=activeRows.map(r=>r.date).sort();
-  document.getElementById('flight').innerHTML=`
-    <div class="label"><b>Flight activo</b> · ${activeRows.length? dmm(aDates[0])+' – '+dmm(aDates[aDates.length-1]):'—'} (Junio 2026)</div>
-    <div class="bar"><div class="bar-fill" style="width:${Math.min(100,Math.round(new Date(dTo+'T00:00:00').getDate()/30*100))}%"></div></div>
-    <div class="label" style="font-size:12px">${(new Set(activeRows.map(r=>r.campaign))).size} campañas activas este mes</div>`;
+  function applyFilters(){
+    const y=fy.value,m=fm.value,c=fc.value,st=fs.value;
+    const rows=ALL.filter(r=>
+      (y==='all'||r.date.slice(0,4)===y) &&
+      (m==='all'||r.date.slice(5,7)===m) &&
+      (c==='all'||r.campaign.trim()===c) &&
+      (st==='all'||statusOf(r.campaign)===st));
+    render(rows);
+  }
+  [fy,fm,fc,fs].forEach(el=>el.addEventListener('change',applyFilters));
+  fr.addEventListener('click',()=>{fy.value='all';fm.value='all';fc.value='all';fs.value='all';applyFilters();});
 
-  // OKR hero
-  document.getElementById('okrGrid').innerHTML=`
-    <div class="okr-card highlight"><div class="okr-label">Impresiones totales</div><div class="okr-value">${copShort(T.impressions).replace('$','')}</div><div class="okr-foot">Entrega acumulada en Meta</div></div>
-    <div class="okr-card"><div class="okr-label">Reach (suma diaria)</div><div class="okr-value">${copShort(T.reach).replace('$','')}</div><div class="okr-foot">Frecuencia media ${dec(T.freq,2)}</div></div>
-    <div class="okr-card"><div class="okr-label">Inversión total</div><div class="okr-value">${copShort(T.spend)}</div><div class="okr-foot">CPM promedio ${cop(T.cpm)}</div></div>`;
+  renderAds(data.ads||[]);
+  render(ALL);
 
-  // KPI by objective
-  const AW=agg(rows.filter(r=>!isTraffic(r))), TR=agg(rows.filter(isTraffic));
-  document.getElementById('kpiGrid').innerHTML=`
-    <div class="kpi-card">
-      <h3>Awareness · Alcance</h3>
-      <div class="kpi-headline">${fmt(AW.impressions)}</div>
-      <div class="kpi-sub">impresiones · reach ${fmt(AW.reach)} · frecuencia ${dec(AW.freq,2)}</div>
-      <div class="kpi-row"><span class="kpi-row-label">Inversión</span><span class="kpi-row-val">${cop(AW.spend)}</span></div>
-      <div class="kpi-row"><span class="kpi-row-label">CPM</span><span class="kpi-row-val">${cop(AW.cpm)}</span></div>
-    </div>
-    <div class="kpi-card traffic">
-      <h3>Traffic · Link clicks</h3>
-      <div class="kpi-headline">${fmt(TR.link_clicks||TR.clicks)}</div>
-      <div class="kpi-sub">link clicks · CTR ${dec(TR.ctr,2)}% · impresiones ${fmt(TR.impressions)}</div>
-      <div class="kpi-row"><span class="kpi-row-label">Inversión</span><span class="kpi-row-val">${cop(TR.spend)}</span></div>
-      <div class="kpi-row"><span class="kpi-row-label">CPC (link)</span><span class="kpi-row-val">${cop(TR.cpc)}</span></div>
-    </div>`;
+  // ---- Render principal (recibe filas filtradas) ----
+  function render(rows){
+    byId('fCount').textContent=rows.length+' filas · '+new Set(rows.map(r=>r.campaign)).size+' campañas';
 
-  // Daily series
-  const days=[...new Set(rows.map(r=>r.date))].sort();
-  const spA=days.map(d=>rows.filter(r=>r.date===d&&!isTraffic(r)).reduce((a,r)=>a+r.spend,0));
-  const spT=days.map(d=>rows.filter(r=>r.date===d&&isTraffic(r)).reduce((a,r)=>a+r.spend,0));
-  const impA=days.map(d=>rows.filter(r=>r.date===d&&!isTraffic(r)).reduce((a,r)=>a+r.impressions,0));
-  const clkT=days.map(d=>rows.filter(r=>r.date===d&&isTraffic(r)).reduce((a,r)=>a+(r.link_clicks||r.clicks),0));
-  const LBL=days.map(dmm);
-  const BLUE='#0095D5',GRAY='#56606A',BLUEL='#43B4E4';
-  Chart.defaults.font.family="-apple-system,'Segoe UI',Roboto,sans-serif";Chart.defaults.color='#5A6271';Chart.defaults.font.size=12;
-
-  new Chart(spendChart,{type:'line',data:{labels:LBL,datasets:[
-    {label:'Awareness',data:spA,borderColor:BLUE,backgroundColor:BLUE+'22',fill:true,tension:.35,borderWidth:2.5,pointRadius:0},
-    {label:'Traffic',data:spT,borderColor:GRAY,backgroundColor:GRAY+'1A',fill:true,tension:.35,borderWidth:2.5,pointRadius:0}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:12}},
-      tooltip:{callbacks:{label:c=>c.dataset.label+': '+cop(c.parsed.y)}}},
-    scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'#EBF0F7'},ticks:{callback:v=>copShort(v)}}}}});
-
-  new Chart(kpiChart,{data:{labels:LBL,datasets:[
-    {type:'bar',label:'Impresiones (Awareness)',data:impA,backgroundColor:BLUE,borderRadius:3,yAxisID:'y'},
-    {type:'line',label:'Link clicks (Traffic)',data:clkT,borderColor:GRAY,backgroundColor:GRAY+'22',tension:.35,borderWidth:2.5,pointRadius:0,yAxisID:'y1'}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:12}},
-      tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)}}},
-    scales:{x:{grid:{display:false}},
-      y:{beginAtZero:true,position:'left',grid:{color:'#EBF0F7'},ticks:{callback:v=>(v/1e6).toFixed(1)+'M'},title:{display:true,text:'Impresiones'}},
-      y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>fmt(v)},title:{display:true,text:'Link clicks'}}}}});
-
-  // By product
-  const prods=[...new Set(rows.map(r=>productOf(r.campaign)))];
-  document.getElementById('prodGrid').innerHTML=prods.map(p=>{
-    const pr=rows.filter(r=>productOf(r.campaign)===p);
-    const aw=agg(pr.filter(r=>!isTraffic(r))), tr=agg(pr.filter(isTraffic));
-    return `<div class="obj-card">
-      <h3>${p}<span class="status active"><span class="dot"></span>${copShort(aw.spend+tr.spend)}</span></h3>
-      <div class="obj-meta">Inversión total ${cop(aw.spend+tr.spend)} · ${(new Set(pr.map(r=>r.campaign))).size} campañas</div>
-      <div class="platforms">
-        <div class="platform aw"><div class="platform-name">Awareness</div><div class="platform-stats">
-          <div class="stat"><span class="stat-label">Impresiones</span><span class="stat-val">${fmt(aw.impressions)}</span></div>
-          <div class="stat"><span class="stat-label">Reach</span><span class="stat-val">${fmt(aw.reach)}</span></div>
-          <div class="stat"><span class="stat-label">CPM</span><span class="stat-val">${cop(aw.cpm)}</span></div>
-          <div class="stat"><span class="stat-label">Spend</span><span class="stat-val">${copShort(aw.spend)}</span></div>
-        </div></div>
-        <div class="platform tr"><div class="platform-name">Traffic</div><div class="platform-stats">
-          <div class="stat"><span class="stat-label">Link clicks</span><span class="stat-val">${fmt(tr.link_clicks||tr.clicks)}</span></div>
-          <div class="stat"><span class="stat-label">CTR</span><span class="stat-val">${dec(tr.ctr,2)}%</span></div>
-          <div class="stat"><span class="stat-label">CPC</span><span class="stat-val">${cop(tr.cpc)}</span></div>
-          <div class="stat"><span class="stat-label">Spend</span><span class="stat-val">${copShort(tr.spend)}</span></div>
-        </div></div>
-      </div></div>`;
-  }).join('');
-
-  // Recomendaciones de optimización · últimos 15 días (tono neutro, sin adjetivos)
-  const win0=addDays(dTo,-14);
-  const r15=rows.filter(r=>r.date>=win0);
-  const T15=agg(r15), A15=agg(r15.filter(r=>!isTraffic(r))), R15=agg(r15.filter(isTraffic));
-  const avgCpc=R15.cpc, avgCpm=A15.cpm, avgCtr=R15.ctr, avgFreq=A15.freq;
-  document.getElementById('analysisIntro').innerHTML=`Ventana: <strong>${dmm(win0)} – ${dmm(dTo)} 2026</strong>. Inversión ${cop(T15.spend)}, ${fmt(T15.impressions)} impresiones y ${fmt(R15.link_clicks||R15.clicks)} link clicks. Recomendaciones ordenadas por inversión asociada en la ventana.`;
-
-  const camp15={};r15.forEach(r=>{(camp15[r.campaign]??=[]).push(r);});
-  const recos=[];
-  Object.entries(camp15).forEach(([name,rs])=>{
-    const a=agg(rs), t=isTraffic(rs[0]), s=name.trim(), clk=a.link_clicks||a.clicks;
-    if(t){
-      if(clk>0&&avgCpc>0&&a.cpc>avgCpc*1.2)
-        recos.push({impact:a.spend,lead:'Revisar segmentación y creativos',body:`Campaña <strong>${s}</strong>: CPC link de ${cop(a.cpc)} frente al promedio Traffic de ${cop(avgCpc)} en la ventana.`});
-      if(a.impressions>0&&avgCtr>0&&a.ctr<avgCtr*0.8)
-        recos.push({impact:a.spend,lead:'Actualizar variantes de creativo',body:`Campaña <strong>${s}</strong>: CTR de ${dec(a.ctr,2)}% frente al promedio Traffic de ${dec(avgCtr,2)}%.`});
-      if(clk>0&&avgCpc>0&&a.cpc<avgCpc*0.8)
-        recos.push({impact:a.spend,lead:'Evaluar incremento de presupuesto',body:`Campaña <strong>${s}</strong>: CPC link de ${cop(a.cpc)}, por debajo del promedio Traffic de ${cop(avgCpc)}.`});
-    } else {
-      if(a.freq>Math.max(2,avgFreq*1.2))
-        recos.push({impact:a.spend,lead:'Ampliar el público',body:`Campaña <strong>${s}</strong>: frecuencia de ${dec(a.freq,2)} sobre reach ${fmt(a.reach)} en la ventana.`});
-      if(a.impressions>0&&avgCpm>0&&a.cpm>avgCpm*1.2)
-        recos.push({impact:a.spend,lead:'Revisar ubicaciones y públicos',body:`Campaña <strong>${s}</strong>: CPM de ${cop(a.cpm)} frente al promedio Awareness de ${cop(avgCpm)}.`});
+    if(!rows.length){
+      byId('subhead').textContent='Colombia · Meta (Facebook / Instagram) · sin datos para el filtro';
+      ['headerMeta','okrGrid','kpiGrid','prodGrid','recoList'].forEach(id=>byId(id).innerHTML='');
+      byId('analysisIntro').textContent='';
+      document.querySelector('#summaryTable tbody').innerHTML='<tr><td colspan="11" style="text-align:center;color:var(--text-muted);padding:24px">Sin datos para los filtros seleccionados.</td></tr>';
+      if(chSpend){chSpend.destroy();chSpend=null;} if(chKpi){chKpi.destroy();chKpi=null;}
+      return;
     }
-  });
-  const prodSp={};r15.forEach(r=>{prodSp[productOf(r.campaign)]=(prodSp[productOf(r.campaign)]||0)+r.spend;});
-  const topP=Object.entries(prodSp).sort((a,b)=>b[1]-a[1])[0];
-  if(topP&&T15.spend>0&&topP[1]/T15.spend>0.5)
-    recos.push({impact:topP[1],lead:'Revisar distribución de inversión',body:`El ${dec(topP[1]/T15.spend*100,0)}% de la inversión de la ventana corresponde a <strong>${topP[0]}</strong>. Revisar la distribución entre productos según los objetivos.`});
 
-  recos.sort((x,y)=>y.impact-x.impact);
-  const topR=recos.slice(0,6);
-  document.getElementById('recoList').innerHTML = topR.length
-    ? topR.map((r,i)=>`<div class="reco"><div class="reco-num">${i+1}</div><div class="reco-body"><span class="reco-lead">${r.lead}</span>${r.body}</div></div>`).join('')
-    : '<div class="reco"><div class="reco-num">–</div><div class="reco-body">Sin desviaciones frente a los promedios de la cuenta en la ventana de 15 días.</div></div>';
+    const dates=rows.map(r=>r.date).sort();
+    const dFrom=dates[0],dTo=dates[dates.length-1];
+    byId('subhead').textContent='Colombia · Meta (Facebook / Instagram) · '+dmy(dFrom)+' – '+dmy(dTo);
 
-  // Top creativos (thumbnails)
-  if (Array.isArray(data.ads) && data.ads.length){
-    document.getElementById('creativosSection').style.display='';
-    const ind=document.getElementById('toggleInd'), grid=document.getElementById('adGrid');
-    ind.textContent='► ver '+data.ads.length+' creativos';
-    document.getElementById('creativosToggle').addEventListener('click',()=>{
+    const T=agg(rows);
+    byId('headerMeta').innerHTML=`
+      <div class="pill"><strong>Periodo</strong><span>${dmy(dFrom)} – ${dmy(dTo)}</span></div>
+      <div class="pill"><strong>Inversión</strong><span>${copShort(T.spend)}</span></div>
+      <div class="pill"><strong>Actualizado</strong><span>${updTxt}</span></div>`;
+
+    byId('okrGrid').innerHTML=`
+      <div class="okr-card highlight"><div class="okr-label">Impresiones totales</div><div class="okr-value">${copShort(T.impressions).replace('$','')}</div><div class="okr-foot">Entrega acumulada en Meta</div></div>
+      <div class="okr-card"><div class="okr-label">Reach (suma diaria)</div><div class="okr-value">${copShort(T.reach).replace('$','')}</div><div class="okr-foot">Frecuencia media ${dec(T.freq,2)}</div></div>
+      <div class="okr-card"><div class="okr-label">Inversión total</div><div class="okr-value">${copShort(T.spend)}</div><div class="okr-foot">CPM promedio ${cop(T.cpm)}</div></div>`;
+
+    const AW=agg(rows.filter(r=>!isTraffic(r))), TR=agg(rows.filter(isTraffic));
+    byId('kpiGrid').innerHTML=`
+      <div class="kpi-card">
+        <h3>Awareness · Alcance</h3>
+        <div class="kpi-headline">${fmt(AW.impressions)}</div>
+        <div class="kpi-sub">impresiones · reach ${fmt(AW.reach)} · frecuencia ${dec(AW.freq,2)}</div>
+        <div class="kpi-row"><span class="kpi-row-label">Inversión</span><span class="kpi-row-val">${cop(AW.spend)}</span></div>
+        <div class="kpi-row"><span class="kpi-row-label">CPM</span><span class="kpi-row-val">${cop(AW.cpm)}</span></div>
+      </div>
+      <div class="kpi-card traffic">
+        <h3>Traffic · Link clicks</h3>
+        <div class="kpi-headline">${fmt(TR.link_clicks||TR.clicks)}</div>
+        <div class="kpi-sub">link clicks · CTR ${dec(TR.ctr,2)}% · impresiones ${fmt(TR.impressions)}</div>
+        <div class="kpi-row"><span class="kpi-row-label">Inversión</span><span class="kpi-row-val">${cop(TR.spend)}</span></div>
+        <div class="kpi-row"><span class="kpi-row-label">CPC (link)</span><span class="kpi-row-val">${cop(TR.cpc)}</span></div>
+      </div>`;
+
+    // Series diarias
+    const days=[...new Set(rows.map(r=>r.date))].sort();
+    const spA=days.map(d=>rows.filter(r=>r.date===d&&!isTraffic(r)).reduce((a,r)=>a+r.spend,0));
+    const spT=days.map(d=>rows.filter(r=>r.date===d&&isTraffic(r)).reduce((a,r)=>a+r.spend,0));
+    const impA=days.map(d=>rows.filter(r=>r.date===d&&!isTraffic(r)).reduce((a,r)=>a+r.impressions,0));
+    const clkT=days.map(d=>rows.filter(r=>r.date===d&&isTraffic(r)).reduce((a,r)=>a+(r.link_clicks||r.clicks),0));
+    const LBL=days.map(dmy);
+
+    if(chSpend)chSpend.destroy();
+    chSpend=new Chart(byId('spendChart'),{type:'line',data:{labels:LBL,datasets:[
+      {label:'Awareness',data:spA,borderColor:BLUE,backgroundColor:BLUE+'22',fill:true,tension:.35,borderWidth:2.5,pointRadius:0},
+      {label:'Traffic',data:spT,borderColor:GRAY,backgroundColor:GRAY+'1A',fill:true,tension:.35,borderWidth:2.5,pointRadius:0}
+    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:12}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+cop(c.parsed.y)}}},
+      scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'#EBF0F7'},ticks:{callback:v=>copShort(v)}}}}});
+
+    if(chKpi)chKpi.destroy();
+    chKpi=new Chart(byId('kpiChart'),{data:{labels:LBL,datasets:[
+      {type:'bar',label:'Impresiones (Awareness)',data:impA,backgroundColor:BLUE,borderRadius:3,yAxisID:'y'},
+      {type:'line',label:'Link clicks (Traffic)',data:clkT,borderColor:GRAY,backgroundColor:GRAY+'22',tension:.35,borderWidth:2.5,pointRadius:0,yAxisID:'y1'}
+    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:12}},
+        tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)}}},
+      scales:{x:{grid:{display:false}},
+        y:{beginAtZero:true,position:'left',grid:{color:'#EBF0F7'},ticks:{callback:v=>(v/1e6).toFixed(1)+'M'},title:{display:true,text:'Impresiones'}},
+        y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},ticks:{callback:v=>fmt(v)},title:{display:true,text:'Link clicks'}}}}});
+
+    // Por producto
+    const prods=[...new Set(rows.map(r=>productOf(r.campaign)))];
+    byId('prodGrid').innerHTML=prods.map(p=>{
+      const pr=rows.filter(r=>productOf(r.campaign)===p);
+      const aw=agg(pr.filter(r=>!isTraffic(r))), tr=agg(pr.filter(isTraffic));
+      return `<div class="obj-card">
+        <h3>${p}<span class="status active"><span class="dot"></span>${copShort(aw.spend+tr.spend)}</span></h3>
+        <div class="obj-meta">Inversión total ${cop(aw.spend+tr.spend)} · ${(new Set(pr.map(r=>r.campaign))).size} campañas</div>
+        <div class="platforms">
+          <div class="platform aw"><div class="platform-name">Awareness</div><div class="platform-stats">
+            <div class="stat"><span class="stat-label">Impresiones</span><span class="stat-val">${fmt(aw.impressions)}</span></div>
+            <div class="stat"><span class="stat-label">Reach</span><span class="stat-val">${fmt(aw.reach)}</span></div>
+            <div class="stat"><span class="stat-label">CPM</span><span class="stat-val">${cop(aw.cpm)}</span></div>
+            <div class="stat"><span class="stat-label">Spend</span><span class="stat-val">${copShort(aw.spend)}</span></div>
+          </div></div>
+          <div class="platform tr"><div class="platform-name">Traffic</div><div class="platform-stats">
+            <div class="stat"><span class="stat-label">Link clicks</span><span class="stat-val">${fmt(tr.link_clicks||tr.clicks)}</span></div>
+            <div class="stat"><span class="stat-label">CTR</span><span class="stat-val">${dec(tr.ctr,2)}%</span></div>
+            <div class="stat"><span class="stat-label">CPC</span><span class="stat-val">${cop(tr.cpc)}</span></div>
+            <div class="stat"><span class="stat-label">Spend</span><span class="stat-val">${copShort(tr.spend)}</span></div>
+          </div></div>
+        </div></div>`;
+    }).join('');
+
+    // Recomendaciones · últimos 15 días del periodo filtrado (tono neutro)
+    const win0=addDays(dTo,-14);
+    const r15=rows.filter(r=>r.date>=win0);
+    const T15=agg(r15), A15=agg(r15.filter(r=>!isTraffic(r))), R15=agg(r15.filter(isTraffic));
+    const avgCpc=R15.cpc, avgCpm=A15.cpm, avgCtr=R15.ctr, avgFreq=A15.freq;
+    byId('analysisIntro').innerHTML=`Ventana: <strong>${dmy(win0)} – ${dmy(dTo)}</strong>. Inversión ${cop(T15.spend)}, ${fmt(T15.impressions)} impresiones y ${fmt(R15.link_clicks||R15.clicks)} link clicks. Recomendaciones ordenadas por inversión asociada en la ventana.`;
+
+    const camp15={};r15.forEach(r=>{(camp15[r.campaign]??=[]).push(r);});
+    const recos=[];
+    Object.entries(camp15).forEach(([name,rs])=>{
+      const a=agg(rs), t=isTraffic(rs[0]), s=name.trim(), clk=a.link_clicks||a.clicks;
+      if(t){
+        if(clk>0&&avgCpc>0&&a.cpc>avgCpc*1.2)
+          recos.push({impact:a.spend,lead:'Revisar segmentación y creativos',body:`Campaña <strong>${s}</strong>: CPC link de ${cop(a.cpc)} frente al promedio Traffic de ${cop(avgCpc)} en la ventana.`});
+        if(a.impressions>0&&avgCtr>0&&a.ctr<avgCtr*0.8)
+          recos.push({impact:a.spend,lead:'Actualizar variantes de creativo',body:`Campaña <strong>${s}</strong>: CTR de ${dec(a.ctr,2)}% frente al promedio Traffic de ${dec(avgCtr,2)}%.`});
+        if(clk>0&&avgCpc>0&&a.cpc<avgCpc*0.8)
+          recos.push({impact:a.spend,lead:'Evaluar incremento de presupuesto',body:`Campaña <strong>${s}</strong>: CPC link de ${cop(a.cpc)}, por debajo del promedio Traffic de ${cop(avgCpc)}.`});
+      } else {
+        if(a.freq>Math.max(2,avgFreq*1.2))
+          recos.push({impact:a.spend,lead:'Ampliar el público',body:`Campaña <strong>${s}</strong>: frecuencia de ${dec(a.freq,2)} sobre reach ${fmt(a.reach)} en la ventana.`});
+        if(a.impressions>0&&avgCpm>0&&a.cpm>avgCpm*1.2)
+          recos.push({impact:a.spend,lead:'Revisar ubicaciones y públicos',body:`Campaña <strong>${s}</strong>: CPM de ${cop(a.cpm)} frente al promedio Awareness de ${cop(avgCpm)}.`});
+      }
+    });
+    const prodSp={};r15.forEach(r=>{prodSp[productOf(r.campaign)]=(prodSp[productOf(r.campaign)]||0)+r.spend;});
+    const topP=Object.entries(prodSp).sort((a,b)=>b[1]-a[1])[0];
+    if(topP&&T15.spend>0&&topP[1]/T15.spend>0.5)
+      recos.push({impact:topP[1],lead:'Revisar distribución de inversión',body:`El ${dec(topP[1]/T15.spend*100,0)}% de la inversión de la ventana corresponde a <strong>${topP[0]}</strong>. Revisar la distribución entre productos según los objetivos.`});
+
+    recos.sort((x,y)=>y.impact-x.impact);
+    const topR=recos.slice(0,6);
+    byId('recoList').innerHTML = topR.length
+      ? topR.map((r,i)=>`<div class="reco"><div class="reco-num">${i+1}</div><div class="reco-body"><span class="reco-lead">${r.lead}</span>${r.body}</div></div>`).join('')
+      : '<div class="reco"><div class="reco-num">–</div><div class="reco-body">Sin desviaciones frente a los promedios de la cuenta en la ventana de 15 días.</div></div>';
+
+    // Tabla resumen
+    const byCamp={};rows.forEach(r=>{(byCamp[r.campaign]??=[]).push(r);});
+    const tcamps=Object.entries(byCamp).map(([name,rs])=>{
+      const ds=rs.map(r=>r.date).sort();return{name,rs,start:ds[0],end:ds[ds.length-1],a:agg(rs)};
+    }).sort((x,y)=>y.a.spend-x.a.spend);
+    document.querySelector('#summaryTable tbody').innerHTML=tcamps.map(c=>{
+      const act=statusOf(c.name)==='Activa';
+      return `<tr>
+        <td><div class="camp-cell" title="${c.name.trim()}">${c.name.trim()}</div></td>
+        <td>${productOf(c.name)}</td>
+        <td>${objName(c.rs[0])}</td>
+        <td><span class="status ${act?'active':'ended'}"><span class="dot"></span>${act?'Activa':'Finalizada'}</span></td>
+        <td>${dmy(c.start)}–${dmy(c.end)}</td>
+        <td class="num">${fmt(c.a.spend)}</td>
+        <td class="num">${fmt(c.a.impressions)}</td>
+        <td class="num">${fmt(c.a.reach)}</td>
+        <td class="num">${fmt(c.a.clicks)}</td>
+        <td class="num">${cop(c.a.cpm)}</td>
+        <td class="num">${dec(c.a.ctr,2)}%</td></tr>`;
+    }).join('');
+  }
+
+  // ---- Creativos (una vez; todo el histórico) ----
+  function renderAds(ads){
+    if(!Array.isArray(ads)||!ads.length) return;
+    byId('creativosSection').style.display='';
+    const ind=byId('toggleInd'), grid=byId('adGrid');
+    ind.textContent='► ver '+ads.length+' creativos';
+    byId('creativosToggle').addEventListener('click',()=>{
       const open=grid.style.display!=='none';
       grid.style.display=open?'none':'grid';
-      ind.textContent=(open?'► ver ':'▼ ocultar ')+data.ads.length+' creativos';
+      ind.textContent=(open?'► ver ':'▼ ocultar ')+ads.length+' creativos';
     });
-    grid.innerHTML=data.ads.map(a=>{
+    grid.innerHTML=ads.map(a=>{
       const ctr=a.impressions?a.clicks/a.impressions*100:0;
       const name=(a.ad_name||'').trim()||'(sin nombre)';
       return `<div class="ad-card">
-        <img class="ad-thumb" loading="lazy" src="${a.thumbnail}" alt="${name}"
-             onerror="this.style.display='none'">
+        <img class="ad-thumb" loading="lazy" src="${a.thumbnail}" alt="${name}" onerror="this.style.display='none'">
         <div class="ad-body">
           <span class="ad-prod">${productOf(a.campaign)}</span>
           <div class="ad-name" title="${name}">${name}</div>
@@ -380,27 +458,6 @@ fetch('data/dashboard.json?_='+Date.now()).then(r=>r.json()).then(data=>{
         </div></div>`;
     }).join('');
   }
-
-  // Summary table by campaign
-  const byCamp={};rows.forEach(r=>{(byCamp[r.campaign]??=[]).push(r);});
-  const camps=Object.entries(byCamp).map(([name,rs])=>{
-    const ds=rs.map(r=>r.date).sort();return{name,rs,start:ds[0],end:ds[ds.length-1],a:agg(rs)};
-  }).sort((x,y)=>y.a.spend-x.a.spend);
-  document.querySelector('#summaryTable tbody').innerHTML=camps.map(c=>{
-    const active=c.end>=addDays(dTo,-2);
-    return `<tr>
-      <td><div class="camp-cell" title="${c.name.trim()}">${c.name.trim()}</div></td>
-      <td>${productOf(c.name)}</td>
-      <td>${objName(c.rs[0])}</td>
-      <td><span class="status ${active?'active':'ended'}"><span class="dot"></span>${active?'Activa':'Finalizada'}</span></td>
-      <td>${dmm(c.start)}–${dmm(c.end)}</td>
-      <td class="num">${fmt(c.a.spend)}</td>
-      <td class="num">${fmt(c.a.impressions)}</td>
-      <td class="num">${fmt(c.a.reach)}</td>
-      <td class="num">${fmt(c.a.clicks)}</td>
-      <td class="num">${cop(c.a.cpm)}</td>
-      <td class="num">${dec(c.a.ctr,2)}%</td></tr>`;
-  }).join('');
 });
 function addDays(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
 </script>

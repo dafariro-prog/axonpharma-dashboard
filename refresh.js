@@ -14,14 +14,15 @@ const RAW_KEY    = (process.env.WINDSOR_API_KEY || '').trim();
 const API_KEY    = (RAW_KEY.match(/api_key=([^&\s]+)/i)?.[1] || RAW_KEY).trim();
 const ACCOUNT_ID = '1211531357024604';            // Axon Pharma Colombia
 const CONNECTOR  = 'facebook';
-const DATE_PRESET= 'last_90d';
+const DATE_FROM  = '2025-01-01';                   // histórico completo (la cuenta arrancó may-2025)
+const DATE_TO    = new Date().toISOString().slice(0,10);  // hoy
 const TOP_ADS    = 12;
 
 if (!API_KEY) { console.error('ERROR: falta WINDSOR_API_KEY'); process.exit(1); }
 
 async function fetchData(fields) {
   const url = `https://connectors.windsor.ai/${CONNECTOR}?` + new URLSearchParams({
-    api_key: API_KEY, date_preset: DATE_PRESET, fields: fields.join(','),
+    api_key: API_KEY, date_from: DATE_FROM, date_to: DATE_TO, fields: fields.join(','),
   });
   const res = await fetch(url);
   if (!res.ok) {
