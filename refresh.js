@@ -9,7 +9,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const API_KEY    = (process.env.WINDSOR_API_KEY || '').trim();   // trim evita espacios/saltos de línea
+// Acepta tanto la key sola como una URL completa pegada por error (extrae lo que va tras api_key=)
+const RAW_KEY    = (process.env.WINDSOR_API_KEY || '').trim();
+const API_KEY    = (RAW_KEY.match(/api_key=([^&\s]+)/i)?.[1] || RAW_KEY).trim();
 const ACCOUNT_ID = '1211531357024604';            // Axon Pharma Colombia
 const CONNECTOR  = 'facebook';
 const DATE_PRESET= 'last_90d';
