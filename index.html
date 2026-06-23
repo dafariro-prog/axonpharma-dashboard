@@ -141,7 +141,7 @@ footer .src{margin-top:6px;opacity:.85}
   </div>
 
   <div class="okr-section">
-    <div class="okr-header"><span class="okr-badge">Métrica clave</span><h2>Alcance de marca · Axon Pharma Colombia</h2></div>
+    <div class="okr-header"><span class="okr-badge">Métrica clave</span><h2 id="okrTitle">Alcance de marca · Axon Pharma Colombia</h2></div>
     <div class="okr-sub">Entrega real en Meta (Facebook/Instagram) y Google Ads (Búsqueda) de los productos A-Cerumen, Marimer y Floratil · moneda COP.</div>
     <div class="okr-grid" id="okrGrid"></div>
   </div>
@@ -306,10 +306,16 @@ Promise.all([
       <div class="pill"><strong>Inversión</strong><span>${copShort(T.spend)}</span></div>
       <div class="pill"><strong>Actualizado</strong><span>${updTxt}</span></div>`;
 
-    byId('okrGrid').innerHTML=`
-      <div class="okr-card highlight"><div class="okr-label">Impresiones totales</div><div class="okr-value">${copShort(T.impressions).replace('$','')}</div><div class="okr-foot">Entrega acumulada en Meta</div></div>
-      <div class="okr-card"><div class="okr-label">Reach (suma diaria)</div><div class="okr-value">${copShort(T.reach).replace('$','')}</div><div class="okr-foot">Frecuencia media ${dec(T.freq,2)}</div></div>
-      <div class="okr-card"><div class="okr-label">Inversión total</div><div class="okr-value">${copShort(T.spend)}</div><div class="okr-foot">CPM promedio ${cop(T.cpm)}</div></div>`;
+    const AWh=agg(rows.filter(r=>objClass(r)==='Awareness'));
+    const hasAw=AWh.impressions>0;
+    byId('okrTitle').textContent = hasAw ? 'Alcance de marca · Axon Pharma Colombia' : 'Tráfico · Axon Pharma Colombia';
+    byId('okrGrid').innerHTML = hasAw ? `
+      <div class="okr-card highlight"><div class="okr-label">Impresiones totales</div><div class="okr-value">${copShort(T.impressions).replace('$','')}</div><div class="okr-foot">Entrega acumulada</div></div>
+      <div class="okr-card"><div class="okr-label">Reach (suma diaria)</div><div class="okr-value">${copShort(AWh.reach).replace('$','')}</div><div class="okr-foot">Frecuencia media ${dec(AWh.freq,2)}</div></div>
+      <div class="okr-card"><div class="okr-label">Inversión total</div><div class="okr-value">${copShort(T.spend)}</div><div class="okr-foot">CPM promedio ${cop(T.cpm)}</div></div>` : `
+      <div class="okr-card highlight"><div class="okr-label">Clics totales</div><div class="okr-value">${copShort(T.link_clicks||T.clicks).replace('$','')}</div><div class="okr-foot">Tráfico a sitio</div></div>
+      <div class="okr-card"><div class="okr-label">CTR</div><div class="okr-value">${dec(T.ctr,2)}%</div><div class="okr-foot">${fmt(T.impressions)} impresiones</div></div>
+      <div class="okr-card"><div class="okr-label">Inversión total</div><div class="okr-value">${copShort(T.spend)}</div><div class="okr-foot">CPC ${cop(T.cpc)}</div></div>`;
 
     const CLASSES=['Awareness','Traffic','Reproducciones'];
     const present=CLASSES.filter(cl=>rows.some(r=>objClass(r)===cl));
