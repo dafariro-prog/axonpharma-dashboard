@@ -183,7 +183,7 @@ footer .src{margin-top:6px;opacity:.85}
     <div class="ad-grid" id="adGrid" style="display:none"></div>
   </section>
 
-  <section>
+  <section id="tableSection">
     <h2 class="section-title">Tabla resumen consolidada</h2>
     <div class="chart-card" style="overflow-x:auto"><table class="summary-table" id="summaryTable">
       <thead><tr>
@@ -297,6 +297,7 @@ Promise.all([
       byId('subhead').textContent='Colombia · Meta (Facebook / Instagram) · sin datos para el filtro';
       ['headerMeta','okrGrid','kpiGrid','prodGrid','recoList'].forEach(id=>byId(id).innerHTML='');
       byId('analysisIntro').textContent='';
+      byId('tableSection').style.display='';
       document.querySelector('#summaryTable tbody').innerHTML='<tr><td colspan="12" style="text-align:center;color:var(--text-muted);padding:24px">Sin datos para los filtros seleccionados.</td></tr>';
       if(chSpend){chSpend.destroy();chSpend=null;} if(chKpi){chKpi.destroy();chKpi=null;}
       return;
@@ -320,7 +321,7 @@ Promise.all([
       <div class="okr-card"><div class="okr-label">Reach (suma diaria)</div><div class="okr-value">${copShort(AWh.reach).replace('$','')}</div><div class="okr-foot">Frecuencia media ${dec(AWh.freq,2)}</div></div>
       <div class="okr-card"><div class="okr-label">Inversión total</div><div class="okr-value">${copShort(T.spend)}</div><div class="okr-foot">CPM promedio ${cop(T.cpm)}</div></div>` : `
       <div class="okr-card highlight"><div class="okr-label">Clics totales</div><div class="okr-value">${copShort(T.link_clicks||T.clicks).replace('$','')}</div><div class="okr-foot">Tráfico a sitio</div></div>
-      <div class="okr-card"><div class="okr-label">CTR</div><div class="okr-value">${dec(T.ctr,2)}%</div><div class="okr-foot">${fmt(T.impressions)} impresiones</div></div>
+      ${T.impressions>0?`<div class="okr-card"><div class="okr-label">CTR</div><div class="okr-value">${dec(T.ctr,2)}%</div><div class="okr-foot">${fmt(T.impressions)} impresiones</div></div>`:''}
       <div class="okr-card"><div class="okr-label">Inversión total</div><div class="okr-value">${copShort(T.spend)}</div><div class="okr-foot">CPC ${cop(T.cpc)}</div></div>`;
 
     const CLASSES=['Awareness','Traffic','Reproducciones'];
@@ -336,7 +337,7 @@ Promise.all([
       if(cl==='Traffic') return `<div class="kpi-card traffic">
         <h3>Traffic · Clics</h3>
         <div class="kpi-headline">${fmt(a.link_clicks||a.clicks)}</div>
-        <div class="kpi-sub">clics · CTR ${dec(a.ctr,2)}% · impresiones ${fmt(a.impressions)}</div>
+        <div class="kpi-sub">clics${a.impressions>0?` · CTR ${dec(a.ctr,2)}% · impresiones ${fmt(a.impressions)}`:''}</div>
         <div class="kpi-row"><span class="kpi-row-label">Inversión</span><span class="kpi-row-val">${cop(a.spend)}</span></div>
         <div class="kpi-row"><span class="kpi-row-label">CPC</span><span class="kpi-row-val">${cop(a.cpc)}</span></div></div>`;
       return `<div class="kpi-card repro">
@@ -436,8 +437,10 @@ Promise.all([
       ? topR.map((r,i)=>`<div class="reco"><div class="reco-num">${i+1}</div><div class="reco-body"><span class="reco-lead">${r.lead}</span>${r.body}</div></div>`).join('')
       : '<div class="reco"><div class="reco-num">–</div><div class="reco-body">Sin desviaciones frente a los promedios de la cuenta en la ventana de 15 días.</div></div>';
 
-    // Tabla resumen
-    const byCamp={};rows.forEach(r=>{(byCamp[r.campaign]??=[]).push(r);});
+    // Tabla resumen (excluye TikTok: no aplica impresiones/reach/CTR)
+    const tableRows=rows.filter(r=>r.source!=='TikTok');
+    byId('tableSection').style.display = tableRows.length ? '' : 'none';
+    const byCamp={};tableRows.forEach(r=>{(byCamp[r.campaign]??=[]).push(r);});
     const tcamps=Object.entries(byCamp).map(([name,rs])=>{
       const ds=rs.map(r=>r.date).sort();return{name,rs,start:ds[0],end:ds[ds.length-1],a:agg(rs)};
     }).sort((x,y)=>y.a.spend-x.a.spend);
