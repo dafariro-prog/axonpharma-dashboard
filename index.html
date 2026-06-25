@@ -142,7 +142,7 @@ footer .src{margin-top:6px;opacity:.85}
 
   <div class="okr-section">
     <div class="okr-header"><span class="okr-badge">Métrica clave</span><h2 id="okrTitle">Alcance de marca · Axon Pharma Colombia</h2></div>
-    <div class="okr-sub">Entrega real en Meta (Facebook/Instagram) y Google Ads (Búsqueda) de los productos A-Cerumen, Marimer y Floratil · moneda COP.</div>
+    <div class="okr-sub">Entrega en Meta (Facebook/Instagram), Google Ads (Búsqueda) y TikTok de los productos A-Cerumen, Marimer y Floratil · moneda COP. TikTok: distribución diaria estimada de totales mensuales reales.</div>
     <div class="okr-grid" id="okrGrid"></div>
   </div>
 
@@ -153,8 +153,8 @@ footer .src{margin-top:6px;opacity:.85}
 
   <section>
     <h2 class="section-title">Evolución diaria de inversión</h2>
-    <div class="chart-card"><h3>Spend diario por plataforma</h3>
-      <div class="chart-sub">Línea azul: Meta · línea gris: Google Ads · valores en COP</div>
+    <div class="chart-card"><h3>Tendencia diaria de inversión por plataforma</h3>
+      <div class="chart-sub">Una línea por plataforma (Meta · Google Ads · TikTok) · valores en COP</div>
       <div class="chart-wrap"><canvas id="spendChart"></canvas></div></div>
   </section>
 
@@ -196,7 +196,8 @@ footer .src{margin-top:6px;opacity:.85}
 
   <footer>
     <div><strong>Informe Axon Pharma Colombia</strong> · <span id="footUpd"></span></div>
-    <div class="src">Fuentes: Meta Ads (Facebook/Instagram) + Google Ads · Cuenta <span id="footAcct"></span> · Solo data real · Moneda COP</div>
+    <div class="src">Fuentes: Meta Ads (Facebook/Instagram) + Google Ads + TikTok · Cuenta <span id="footAcct"></span> · Moneda COP<br>
+    Meta y Google Ads: data real medida. TikTok: distribución diaria <b>estimada</b> a partir de totales mensuales reales (tipo de cambio COP 3.800).</div>
   </footer>
 </div>
 
@@ -236,9 +237,14 @@ Chart.defaults.font.family="-apple-system,'Segoe UI',Roboto,sans-serif";Chart.de
 
 Promise.all([
   fetch('data/dashboard.json?_='+Date.now()).then(r=>r.json()),
-  fetch('data/google_ads.json?_='+Date.now()).then(r=>r.ok?r.json():{rows:[]}).catch(()=>({rows:[]}))
-]).then(([data, ga])=>{
-  const ALL=[...(data.rows||[]).map(r=>({...r,source:'Meta'})), ...(ga.rows||[]).map(r=>({...r,source:'Google Ads'}))];
+  fetch('data/google_ads.json?_='+Date.now()).then(r=>r.ok?r.json():{rows:[]}).catch(()=>({rows:[]})),
+  fetch('data/tiktok.json?_='+Date.now()).then(r=>r.ok?r.json():{rows:[]}).catch(()=>({rows:[]}))
+]).then(([data, ga, tt])=>{
+  const ALL=[
+    ...(data.rows||[]).map(r=>({...r,source:'Meta'})),
+    ...(ga.rows||[]).map(r=>({...r,source:'Google Ads'})),
+    ...(tt.rows||[]).map(r=>({...r,source:'TikTok'}))
+  ];
   const gMax=ALL.map(r=>r.date).sort().at(-1);
   const gMin=ALL.map(r=>r.date).sort()[0];
   const campEnd={}; ALL.forEach(r=>{ if(!campEnd[r.campaign]||r.date>campEnd[r.campaign]) campEnd[r.campaign]=r.date; });
@@ -343,17 +349,18 @@ Promise.all([
 
     // Series diarias
     const days=[...new Set(rows.map(r=>r.date))].sort();
-    const spMeta=days.map(d=>rows.filter(r=>r.date===d&&r.source==='Meta').reduce((a,r)=>a+r.spend,0));
-    const spGA=days.map(d=>rows.filter(r=>r.date===d&&r.source==='Google Ads').reduce((a,r)=>a+r.spend,0));
+    const SRC_COLORS={'Meta':'#0095D5','Google Ads':'#56606A','TikTok':'#111111'};
+    const srcs=[...new Set(rows.map(r=>r.source))].sort();
+    const spendDS=srcs.map(src=>({label:src,
+      data:days.map(d=>rows.filter(r=>r.date===d&&r.source===src).reduce((a,r)=>a+r.spend,0)),
+      borderColor:SRC_COLORS[src]||'#888',backgroundColor:(SRC_COLORS[src]||'#888')+'22',fill:true,tension:.35,borderWidth:2.5,pointRadius:0}));
     const impAll=days.map(d=>rows.filter(r=>r.date===d).reduce((a,r)=>a+r.impressions,0));
     const clkAll=days.map(d=>rows.filter(r=>r.date===d).reduce((a,r)=>a+(r.link_clicks||r.clicks),0));
     const LBL=days.map(dmy);
 
     if(chSpend)chSpend.destroy();
-    chSpend=new Chart(byId('spendChart'),{type:'line',data:{labels:LBL,datasets:[
-      {label:'Meta',data:spMeta,borderColor:BLUE,backgroundColor:BLUE+'22',fill:true,tension:.35,borderWidth:2.5,pointRadius:0},
-      {label:'Google Ads',data:spGA,borderColor:GRAY,backgroundColor:GRAY+'1A',fill:true,tension:.35,borderWidth:2.5,pointRadius:0}
-    ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    chSpend=new Chart(byId('spendChart'),{type:'line',data:{labels:LBL,datasets:spendDS},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
       plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',padding:12}},
         tooltip:{callbacks:{label:c=>c.dataset.label+': '+cop(c.parsed.y)}}},
       scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:'#EBF0F7'},ticks:{callback:v=>copShort(v)}}}}});
@@ -438,7 +445,7 @@ Promise.all([
       const act=statusOf(c.name)==='Activa';
       return `<tr>
         <td><div class="camp-cell" title="${c.name.trim()}">${c.name.trim()}</div></td>
-        <td>${c.rs[0].source||'Meta'}</td>
+        <td>${(c.rs[0].source||'Meta')}${c.rs[0].estimated?' <span title="distribución diaria estimada" style="color:var(--amber)">*</span>':''}</td>
         <td>${productOf(c.name)}</td>
         <td>${objClass(c.rs[0])}</td>
         <td><span class="status ${act?'active':'ended'}"><span class="dot"></span>${act?'Activa':'Finalizada'}</span></td>
