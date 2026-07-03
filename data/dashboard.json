@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-02T13:06:09.864Z",
+  "updated": "2026-07-03T13:05:22.025Z",
   "account": {
     "id": "1211531357024604",
     "name": "Axon Pharma Colombia",
@@ -28987,6 +28987,34 @@
       "cpc": 55.8817,
       "cpm": 2657.7845,
       "ctr": 0.0476
+    },
+    {
+      "campaign": "Jul26_CO_AxonPharma_FLORATIL_FB/IG_Awareness",
+      "objective": "OUTCOME_AWARENESS",
+      "date": "2026-07-02",
+      "spend": 547201,
+      "impressions": 614036,
+      "reach": 502641,
+      "frequency": 1.2216,
+      "clicks": 1814,
+      "link_clicks": 985,
+      "cpc": 301.6544,
+      "cpm": 891.1546,
+      "ctr": 0.003
+    },
+    {
+      "campaign": "Jul26_CO_AxonPharma_FLORATIL_FB/IG_Awareness",
+      "objective": "OUTCOME_AWARENESS",
+      "date": "2026-07-03",
+      "spend": 136847,
+      "impressions": 164447,
+      "reach": 147766,
+      "frequency": 1.1129,
+      "clicks": 408,
+      "link_clicks": 191,
+      "cpc": 335.4093,
+      "cpm": 832.1648,
+      "ctr": 0.0025
     }
   ],
   "ads": [
