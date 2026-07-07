@@ -143,6 +143,7 @@ footer .src{margin-top:6px;opacity:.85}
   <div class="filters" id="filters">
     <div class="f"><label>Año</label><div class="ms" id="msYear"></div></div>
     <div class="f"><label>Mes</label><div class="ms" id="msMonth"></div></div>
+    <div class="f"><label>Producto</label><div class="ms" id="msProd"></div></div>
     <div class="f"><label>Campaña</label><div class="ms" id="msCamp"></div></div>
     <div class="f"><label>Estado</label><div class="ms" id="msStatus"></div></div>
     <div class="f"><label>Plataforma</label><div class="ms" id="msPlat"></div></div>
@@ -305,25 +306,28 @@ Promise.all([
 
   // ---- Poblar filtros ----
   const years=[...new Set(ALL.map(r=>r.date.slice(0,4)))].sort();
+  const prods=[...new Set(ALL.map(r=>productOf(r.campaign)))].sort();
   const camps=[...new Set(ALL.map(r=>r.campaign.trim()))].sort();
   const plats=[...new Set(ALL.map(r=>r.source))].sort();
   const msY=makeMS(byId('msYear'), years.map(y=>({value:y,label:y})), applyFilters, {allLabel:'Todos'});
   const msM=makeMS(byId('msMonth'), Object.keys(MESN).map(m=>({value:m,label:MESN[m]})), applyFilters, {allLabel:'Todos'});
+  const msPr=makeMS(byId('msProd'), prods.map(p=>({value:p,label:p})), applyFilters, {allLabel:'Todos'});
   const msC=makeMS(byId('msCamp'), camps.map(c=>({value:c,label:c})), applyFilters, {allLabel:'Todas', wide:true});
   const msS=makeMS(byId('msStatus'), [{value:'Activa',label:'Activa'},{value:'Finalizada',label:'Finalizada'}], applyFilters, {allLabel:'Todos'});
   const msP=makeMS(byId('msPlat'), plats.map(p=>({value:p,label:p})), applyFilters, {allLabel:'Todas'});
 
   function applyFilters(){
-    const ys=msY.selected(), ms=msM.selected(), cs=msC.selected(), ss=msS.selected(), ps=msP.selected();
+    const ys=msY.selected(), ms=msM.selected(), prs=msPr.selected(), cs=msC.selected(), ss=msS.selected(), ps=msP.selected();
     const rows=ALL.filter(r=>
       (ys.length===0||ys.includes(r.date.slice(0,4))) &&
       (ms.length===0||ms.includes(r.date.slice(5,7))) &&
+      (prs.length===0||prs.includes(productOf(r.campaign))) &&
       (cs.length===0||cs.includes(r.campaign.trim())) &&
       (ss.length===0||ss.includes(statusOf(r.campaign))) &&
       (ps.length===0||ps.includes(r.source)));
     render(rows);
   }
-  byId('fReset').addEventListener('click',()=>{msY.clear();msM.clear();msC.clear();msS.clear();msP.clear();applyFilters();});
+  byId('fReset').addEventListener('click',()=>{msY.clear();msM.clear();msPr.clear();msC.clear();msS.clear();msP.clear();applyFilters();});
 
   renderAds(data.ads||[]);
   applyFilters();
